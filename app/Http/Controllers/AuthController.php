@@ -26,8 +26,11 @@ class AuthController extends Controller
             'id_role' => 1,
         ]);
 
+        $token = $user->createToken('frontend-token')->plainTextToken;
+
         return response()->json([
             'message' => 'Register berhasil',
+            'token' => $token,
             'user' => $user,
         ], 201);
     }

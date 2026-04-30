@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Services\Gemini;
+
+use Illuminate\Support\Facades\Http;
+use RuntimeException;
+
+class GeminiClient
+{
+    private string $baseUrl;
+    private string $key;
+    private array $models;
+
+    public function __construct()
+    {
+        $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+        $this->key = (string) config('services.gemini.key', '');
+        $this->models = [
+            'gemini-flash-latest',
+            'gemini-flash-lite-latest',
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-3-flash-preview',
+        ];
+    }
+
+    public function generate(string $prompt): array
+    {
+        if ($this->key === '') {
+            throw new RuntimeException('GEMINI_API_KEY belum diatur.');
+        }
+
+        $lastMessage = 'Gemini API mengembalikan error.';
+
+        foreach ($this->models as $model) {
+            for ($attempt = 1; $attempt <= 2; $attempt++) {
+                $response = Http::timeout(30)->acceptJson()->post($this->urlFor($model), [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
+                        ],
+                    ],
+                    'generationConfig' => [
+                        'temperature' => 0.2,
+                        'maxOutputTokens' => 4096,
+                        'responseMimeType' => 'application/json',
+                    ],
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json() ?? [];
+                }
+
+                $lastMessage = $response->json('error.message') ?? $lastMessage;
+
+                if (! $this->shouldRetry($response->status(), $lastMessage)) {
+                    throw new RuntimeException($lastMessage);
+                }
+
+                usleep(300000);
+            }
+        }
+
+        throw new RuntimeException($lastMessage);
+    }
+
+    private function urlFor(string $model): string
+    {
+        return "{$this->baseUrl}/{$model}:generateContent?key={$this->key}";
+    }
+
+    private function shouldRetry(int $status, string $message): bool
+    {
+        return in_array($status, [429, 500, 502, 503, 504], true)
+            || str_contains(strtolower($message), 'high demand');
+    }
+}

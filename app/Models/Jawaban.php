@@ -17,4 +17,14 @@ class Jawaban extends Model
         'pertanyaan_id',
         'jawaban',
     ];
+
+    public function pertanyaan()
+    {
+        return $this->belongsTo(Pertanyaan::class, 'pertanyaan_id', 'pertanyaan_id');
+    }
+
+    public function usaha()
+    {
+        return $this->belongsTo(Usaha::class, 'id_usaha', 'id_usaha');
+    }
 }
