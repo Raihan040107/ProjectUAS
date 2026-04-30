@@ -35,5 +35,15 @@ class DatabaseSeeder extends Seeder
                 'id_role' => 1,
             ]
         );
+
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'nama' => 'Admin',
+                'username' => 'admin',
+                'password' => 'password',
+                'id_role' => 2,
+            ]
+        );
     }
 }
