@@ -24,6 +24,7 @@ return [
 
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
+        'ca_bundle' => env('GEMINI_CA_BUNDLE'),
     ],
 
     'ses' => [

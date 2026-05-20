@@ -2,6 +2,7 @@
 
 namespace App\Services\Gemini;
 
+use Composer\CaBundle\CaBundle;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -34,20 +35,23 @@ class GeminiClient
 
         foreach ($this->models as $model) {
             for ($attempt = 1; $attempt <= 2; $attempt++) {
-                $response = Http::timeout(30)->acceptJson()->post($this->urlFor($model), [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $prompt],
+                $response = Http::timeout(30)
+                    ->acceptJson()
+                    ->withOptions(['verify' => $this->caBundlePath()])
+                    ->post($this->urlFor($model), [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    ['text' => $prompt],
+                                ],
                             ],
                         ],
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.2,
-                        'maxOutputTokens' => 4096,
-                        'responseMimeType' => 'application/json',
-                    ],
-                ]);
+                        'generationConfig' => [
+                            'temperature' => 0.2,
+                            'maxOutputTokens' => 4096,
+                            'responseMimeType' => 'application/json',
+                        ],
+                    ]);
 
                 if ($response->successful()) {
                     return $response->json() ?? [];
@@ -69,6 +73,17 @@ class GeminiClient
     private function urlFor(string $model): string
     {
         return "{$this->baseUrl}/{$model}:generateContent?key={$this->key}";
+    }
+
+    private function caBundlePath(): string
+    {
+        $configuredPath = trim((string) config('services.gemini.ca_bundle', ''));
+
+        if ($configuredPath !== '') {
+            return $configuredPath;
+        }
+
+        return CaBundle::getSystemCaRootBundlePath();
     }
 
     private function shouldRetry(int $status, string $message): bool

@@ -1,3 +1,23 @@
+## Project Setup
+
+```bash
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+Isi `GEMINI_API_KEY` di `.env` sebelum submit jawaban yang butuh analisis AI.
+
+Koneksi Gemini memakai `composer/ca-bundle`, jadi project tidak bergantung pada path `curl.cainfo` lokal di `php.ini`. Kalau environment tertentu tetap perlu certificate sendiri, isi:
+
+```env
+GEMINI_CA_BUNDLE=C:\path\to\cacert.pem
+```
+
+Jangan commit `.env` atau API key ke GitHub.
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
