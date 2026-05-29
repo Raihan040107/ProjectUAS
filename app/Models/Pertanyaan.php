@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pertanyaan extends Model
 {
@@ -14,10 +15,20 @@ class Pertanyaan extends Model
 
     protected $fillable = [
         'pertanyaan',
+        'aspek',
+        'urutan',
     ];
 
-    public function jawaban()
+    protected $casts = [
+        'urutan' => 'integer',
+    ];
+
+    public function opsiJawaban(): HasMany
     {
-        return $this->hasMany(Jawaban::class, 'pertanyaan_id', 'pertanyaan_id');
+        return $this->hasMany(
+            OpsiJawaban::class,
+            'pertanyaan_id',
+            'pertanyaan_id'
+        )->orderBy('label');
     }
 }
