@@ -49,4 +49,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/pertanyaan/{id}/opsi/{opsiId}', [PertanyaanController::class, 'updateOpsi']);
     Route::delete('/pertanyaan/{id}/opsi/{opsiId}', [PertanyaanController::class, 'destroyOpsi']);
+    Route::delete('/admin/usaha/{id}', [UsahaController::class, 'destroy']);
+
+    Route::get('/admin/dokumen', function (\Illuminate\Http\Request $request) {
+        $path = $request->query('path');
+        $fullPath = storage_path('app/public/' . $path);
+
+        if (!$path || !file_exists($fullPath)) {
+            abort(404);
+        }
+
+        return response()->file($fullPath);
+    });
 });

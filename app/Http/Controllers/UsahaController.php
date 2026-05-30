@@ -146,6 +146,26 @@ class UsahaController extends Controller
         ]);
     }
 
+    public function destroy(Request $request, int $id)
+    {
+        if ($request->user()->id_role !== 2) {
+            return response()->json([
+                'message' => 'Hanya admin yang boleh menghapus usaha.',
+            ], 403);
+        }
+
+        $usaha = Usaha::findOrFail($id);
+
+        // Hapus dokumen yang terkait
+        Dokumen::where('id_usaha', $usaha->id_usaha)->delete();
+
+        // Hapus usaha
+        $usaha->delete();
+
+        return response()->json([
+            'message' => 'Usaha berhasil dihapus.',
+        ]);
+    }
     private function documentValue(Request $request, string $field, mixed $fallback): string
     {
         $file = $request->file($field);
