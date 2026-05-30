@@ -4,18 +4,20 @@ namespace App\Services\Gemini;
 
 use App\Models\Pertanyaan;
 use App\Models\User;
+use App\Models\Usaha;
 
 class PromptBuilder
 {
-    public function build(User $user, array $jawabanData): string
+    public function build(User $user, Usaha $usaha, array $jawabanData): string
     {
         $ids = array_column($jawabanData, 'pertanyaan_id');
 
-        $pertanyaanMap = Pertanyaan::whereIn('pertanyaan_id', $ids)
+        $pertanyaanMap = Pertanyaan::with('opsiJawaban')
+            ->whereIn('pertanyaan_id', $ids)
             ->get()
             ->keyBy('pertanyaan_id');
 
-        $prompt = "
+        $prompt = <<<PROMPT
 ROLE: ESG Financial & Business Risk Analyst AI
 
 TASK:
@@ -29,17 +31,34 @@ USER DATA:
 Nama: {$user->nama}
 Email: {$user->email}
 
+BUSINESS DATA:
+Nama Usaha: {$usaha->nama_usaha}
+Bidang Usaha: {$usaha->bidang_usaha}
+Alamat/Lokasi: {$usaha->alamat}
+
 INTERVIEW DATA:
-";
+PROMPT;
 
         foreach ($jawabanData as $i => $item) {
             $q = $pertanyaanMap[$item['pertanyaan_id']] ?? null;
+            $answer = trim((string) $item['jawaban']);
+            $selectedLabel = $this->selectedLabel($answer);
+            $selectedOption = $q && $selectedLabel
+                ? $q->opsiJawaban->firstWhere('label', $selectedLabel)
+                : null;
 
             $prompt .= ($i + 1) . ". Q: " . ($q->pertanyaan ?? 'Unknown') . "\n";
-            $prompt .= "A: {$item['jawaban']}\n\n";
+            $prompt .= "Aspek: " . ($q->aspek ?? 'unknown') . "\n";
+            $prompt .= "A: {$answer}\n";
+
+            if ($selectedOption) {
+                $prompt .= "Nilai opsi DB: {$selectedOption->nilai} dari 3\n";
+            }
+
+            $prompt .= "\n";
         }
 
-        $prompt .= "
+        $prompt .= <<<PROMPT
 OUTPUT FORMAT (STRICT JSON ONLY):
 {
   \"dampak\": {
@@ -69,10 +88,20 @@ RULES:
 - Keep every string concise, under 220 characters
 - ALL scores must be 0-100
 - TOTAL = average of ESG scores
+- Use BUSINESS DATA, INTERVIEW DATA, and Nilai opsi DB as the main evidence
 - If data unclear, assume conservative estimation
 - Do NOT hallucinate facts outside input
-";
+PROMPT;
 
         return $prompt;
+    }
+
+    private function selectedLabel(string $answer): ?string
+    {
+        if (preg_match('/^\s*([A-Z])\s*\./i', $answer, $matches)) {
+            return strtoupper($matches[1]);
+        }
+
+        return null;
     }
 }

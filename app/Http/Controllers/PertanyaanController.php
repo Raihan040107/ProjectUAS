@@ -32,7 +32,7 @@ class PertanyaanController extends Controller
     public function index()
     {
         $pertanyaan = Pertanyaan::with('opsiJawaban')
-            ->orderByRaw("FIELD(aspek, 'environment', 'social', 'governance')")
+            ->orderByRaw("CASE aspek WHEN 'environment' THEN 1 WHEN 'social' THEN 2 WHEN 'governance' THEN 3 ELSE 4 END")
             ->orderBy('urutan')
             ->get();
 

@@ -3,6 +3,7 @@
 namespace App\Services\Gemini;
 
 use App\Models\User;
+use App\Models\Usaha;
 use RuntimeException;
 
 class GeminiService
@@ -12,9 +13,9 @@ class GeminiService
         private GeminiClient $client
     ) {}
 
-    public function analyze(User $user, array $jawabanData): array
+    public function analyze(User $user, Usaha $usaha, array $jawabanData): array
     {
-        $prompt = $this->promptBuilder->build($user, $jawabanData);
+        $prompt = $this->promptBuilder->build($user, $usaha, $jawabanData);
 
         $response = $this->client->generate($prompt);
 

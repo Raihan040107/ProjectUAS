@@ -74,4 +74,30 @@ class AuthController extends Controller
             'message' => 'Logout berhasil',
         ]);
     }
+
+    public function adminUsers(Request $request)
+    {
+        if ($request->user()->id_role !== 2) {
+            return response()->json([
+                'message' => 'Hanya admin yang boleh melihat daftar user.',
+            ], 403);
+        }
+
+        $users = User::query()
+            ->orderBy('id_role', 'desc')
+            ->orderBy('nama')
+            ->get()
+            ->map(fn (User $user) => [
+                'id' => $user->user_id,
+                'name' => $user->nama,
+                'email' => $user->email,
+                'id_role' => $user->id_role,
+                'created_at' => null,
+            ])
+            ->values();
+
+        return response()->json([
+            'data' => $users,
+        ]);
+    }
 }

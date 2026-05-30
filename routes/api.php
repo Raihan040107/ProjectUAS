@@ -14,6 +14,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/admin/users', [AuthController::class, 'adminUsers']);
+    Route::get('/admin/usaha', [UsahaController::class, 'adminIndex']);
+    Route::put('/admin/usaha/{id}/verifikasi', [UsahaController::class, 'verify']);
     // Route::put('/admin/pertanyaan/{id}', [PertanyaanController::class, 'update']);
     // Route::delete('/admin/pertanyaan/{id}', [PertanyaanController::class, 'destroy']);
 

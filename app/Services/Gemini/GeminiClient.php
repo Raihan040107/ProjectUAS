@@ -59,6 +59,10 @@ class GeminiClient
 
                 $lastMessage = $response->json('error.message') ?? $lastMessage;
 
+                if ($this->shouldTryNextModel($response->status(), $lastMessage)) {
+                    break;
+                }
+
                 if (! $this->shouldRetry($response->status(), $lastMessage)) {
                     throw new RuntimeException($lastMessage);
                 }
@@ -90,5 +94,15 @@ class GeminiClient
     {
         return in_array($status, [429, 500, 502, 503, 504], true)
             || str_contains(strtolower($message), 'high demand');
+    }
+
+    private function shouldTryNextModel(int $status, string $message): bool
+    {
+        $message = strtolower($message);
+
+        return $status === 404
+            || str_contains($message, 'not found')
+            || str_contains($message, 'is not supported')
+            || str_contains($message, 'not supported');
     }
 }

@@ -20,15 +20,29 @@ class JawabanService
         $result = DB::transaction(function () use ($user, $jawabanData, $usahaId) {
             $usaha = $this->resolveUsaha($user, $usahaId);
 
-            $jawaban = collect($jawabanData)->map(function (array $item) use ($usaha) {
-                return Jawaban::updateOrCreate(
-                    [
-                        'id_usaha' => $usaha->id_usaha,
-                        'pertanyaan_id' => $item['pertanyaan_id'],
-                    ],
-                    ['jawaban' => $item['jawaban']]
-                );
-            })->values();
+            $questionIds = collect($jawabanData)
+                ->pluck('pertanyaan_id')
+                ->map(fn ($id) => (int) $id)
+                ->values();
+
+            DB::table('jawaban')
+                ->where('id_usaha', $usaha->id_usaha)
+                ->whereIn('pertanyaan_id', $questionIds)
+                ->delete();
+
+            DB::table('jawaban')->insert(
+                collect($jawabanData)->map(fn (array $item) => [
+                    'id_usaha' => $usaha->id_usaha,
+                    'pertanyaan_id' => (int) $item['pertanyaan_id'],
+                    'jawaban' => $item['jawaban'],
+                ])->all()
+            );
+
+            $jawaban = Jawaban::query()
+                ->where('id_usaha', $usaha->id_usaha)
+                ->whereIn('pertanyaan_id', $questionIds)
+                ->orderBy('pertanyaan_id')
+                ->get();
 
             return [
                 'usaha' => $usaha,
@@ -41,7 +55,7 @@ class JawabanService
         $aiMessage = 'Analisis AI berhasil';
 
         try {
-            $analysis = $this->gemini->analyze($user, $jawabanData);
+            $analysis = $this->gemini->analyze($user, $result['usaha'], $jawabanData);
             $analysis = is_array($analysis) ? $this->withScoreCategory($analysis) : $analysis;
             $this->storeAnalysis($result['usaha']->id_usaha, $analysis);
         } catch (Throwable $exception) {
@@ -114,6 +128,12 @@ class JawabanService
         }
 
         return [
+            'usaha' => [
+                'id_usaha' => $usaha->id_usaha,
+                'nama_usaha' => $usaha->nama_usaha,
+                'bidang_usaha' => $usaha->bidang_usaha,
+                'alamat' => $usaha->alamat,
+            ],
             'dampak' => [
                 'lingkungan' => $dampak->dampak_lingkungan ?? null,
                 'sosial' => $dampak->dampak_sosial ?? null,
@@ -125,6 +145,7 @@ class JawabanService
                 'governance' => isset($score->skor_governance) ? (float) $score->skor_governance : null,
                 'total' => isset($score->skor_total) ? (float) $score->skor_total : null,
                 'kategori' => $score->kategori_skor ?? null,
+                'tanggal_perhitungan' => $score->tanggal_perhitungan ?? null,
             ],
             'rekomendasi' => $pengajuan->text_saran ?? null,
             'pengajuan' => [

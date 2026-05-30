@@ -141,7 +141,15 @@ class PertanyaanSeeder extends Seeder
             $opsi = $item['opsi'];
             unset($item['opsi']);
 
-            $pertanyaan = Pertanyaan::create($item);
+            $pertanyaan = Pertanyaan::updateOrCreate(
+                ['pertanyaan' => $item['pertanyaan']],
+                [
+                    'aspek' => $item['aspek'],
+                    'urutan' => $item['urutan'],
+                ]
+            );
+
+            $pertanyaan->opsiJawaban()->delete();
 
             foreach ($opsi as $o) {
                 $pertanyaan->opsiJawaban()->create($o);
