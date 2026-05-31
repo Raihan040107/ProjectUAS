@@ -4,10 +4,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JawabanController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\UsahaController;
+use App\Http\Controllers\FaqController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/faqs', [FaqController::class, 'index']);
 
 
 
@@ -17,15 +19,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/users', [AuthController::class, 'adminUsers']);
     Route::get('/admin/usaha', [UsahaController::class, 'adminIndex']);
     Route::put('/admin/usaha/{id}/verifikasi', [UsahaController::class, 'verify']);
-    // Route::put('/admin/pertanyaan/{id}', [PertanyaanController::class, 'update']);
-    // Route::delete('/admin/pertanyaan/{id}', [PertanyaanController::class, 'destroy']);
-
-    // Route::get('/pertanyaan', [PertanyaanController::class, 'index']);
-    // Route::get('/usaha', [UsahaController::class, 'index']);
-    // Route::post('/usaha', [UsahaController::class, 'store']);
-    // Route::post('/jawaban', [JawabanController::class, 'store']);
-    // Route::get('/jawaban/analisis', [JawabanController::class, 'analysis']);
-    // Route::post('/admin/pertanyaan', [PertanyaanController::class, 'store']);
     Route::get('/usaha', [UsahaController::class, 'index']);
     Route::post('/usaha', [UsahaController::class, 'store']);
 
@@ -61,4 +54,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         return response()->file($fullPath);
     });
+
+    // FAQ — Admin CRUD (cukup ikuti pola yang sudah ada)
+    Route::get('/admin/faqs',              [FaqController::class, 'adminIndex']);
+    Route::post('/admin/faqs',             [FaqController::class, 'store']);
+    Route::post('/admin/faqs/reorder',     [FaqController::class, 'reorder']); // ← HARUS sebelum {faq}
+    Route::put('/admin/faqs/{faq}',        [FaqController::class, 'update']);
+    Route::delete('/admin/faqs/{faq}',     [FaqController::class, 'destroy']);
 });

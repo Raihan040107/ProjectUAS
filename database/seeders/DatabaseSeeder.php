@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
 
         // Jalankan seeder pertanyaan + opsi jawaban
         $this->call([
-            PertanyaanSeeder::class,
+            FaqSeeder::class,
         ]);
     }
 }
