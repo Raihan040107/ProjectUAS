@@ -6,12 +6,14 @@ use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\UsahaController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\StudiKasusController;
+use App\Http\Controllers\KeunggulanController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/studi-kasus', [StudiKasusController::class, 'index']);
+Route::get('/keunggulan', [KeunggulanController::class, 'index']);
 
 
 
@@ -69,4 +71,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/studi-kasus/reorder', [StudiKasusController::class, 'reorder']);
     Route::put('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'update']);
     Route::delete('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'destroy']);
+
+    Route::get('/keunggulan',                    [KeunggulanController::class, 'adminIndex']);
+    Route::post('/keunggulan',                   [KeunggulanController::class, 'store']);
+    Route::post('/keunggulan/reorder',           [KeunggulanController::class, 'reorder']);
+    Route::put('/keunggulan/{keunggulan}',       [KeunggulanController::class, 'update']);
+    Route::delete('/keunggulan/{keunggulan}',    [KeunggulanController::class, 'destroy']);
 });
