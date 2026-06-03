@@ -72,9 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'update']);
     Route::delete('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'destroy']);
 
-    Route::get('/keunggulan',                    [KeunggulanController::class, 'adminIndex']);
-    Route::post('/keunggulan',                   [KeunggulanController::class, 'store']);
-    Route::post('/keunggulan/reorder',           [KeunggulanController::class, 'reorder']);
-    Route::put('/keunggulan/{keunggulan}',       [KeunggulanController::class, 'update']);
-    Route::delete('/keunggulan/{keunggulan}',    [KeunggulanController::class, 'destroy']);
+    Route::get('/admin/keunggulan',                 [KeunggulanController::class, 'adminIndex']);
+    Route::post('/admin/keunggulan',                [KeunggulanController::class, 'store']);
+    Route::post('/admin/keunggulan/reorder',        [KeunggulanController::class, 'reorder']);
+    Route::put('/admin/keunggulan/{keunggulan}',    [KeunggulanController::class, 'update']);
+    Route::delete('/admin/keunggulan/{keunggulan}', [KeunggulanController::class, 'destroy']);
 });
