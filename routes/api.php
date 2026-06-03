@@ -5,11 +5,13 @@ use App\Http\Controllers\JawabanController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\UsahaController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\StudiKasusController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/faqs', [FaqController::class, 'index']);
+Route::get('/studi-kasus', [StudiKasusController::class, 'index']);
 
 
 
@@ -61,4 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/faqs/reorder',     [FaqController::class, 'reorder']); // ← HARUS sebelum {faq}
     Route::put('/admin/faqs/{faq}',        [FaqController::class, 'update']);
     Route::delete('/admin/faqs/{faq}',     [FaqController::class, 'destroy']);
+
+    Route::get('/admin/studi-kasus', [StudiKasusController::class, 'adminIndex']);
+    Route::post('/admin/studi-kasus', [StudiKasusController::class, 'store']);
+    Route::post('/admin/studi-kasus/reorder', [StudiKasusController::class, 'reorder']);
+    Route::put('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'update']);
+    Route::delete('/admin/studi-kasus/{studiKasus}', [StudiKasusController::class, 'destroy']);
 });
