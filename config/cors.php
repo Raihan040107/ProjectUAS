@@ -1,9 +1,21 @@
-'allowed_origins' => [
-'https://finsustain.vercel.app/',
-], // mungkin ada yang salah di baris lain
+<?php
 
-'allowed_origins' => ['https://finsustain-web.vercel.app'],
-'allowed_origins_patterns' => [], // ← ini harus array kosong, bukan angka
-'allowed_headers' => ['*'], // ← ini juga harus array
-'exposed_headers' => [], // ← ini juga
-'allowed_methods' => ['*'], // ← ini juga
+return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => [
+        'https://finsustain-web.vercel.app',
+    ],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+    'supports_credentials' => true,
+];
