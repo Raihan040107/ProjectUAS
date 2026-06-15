@@ -9,8 +9,8 @@ use App\Http\Controllers\StudiKasusController;
 use App\Http\Controllers\KeunggulanController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'register']);
+Route::get('/login', [AuthController::class, 'login']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/studi-kasus', [StudiKasusController::class, 'index']);
 Route::get('/keunggulan', [KeunggulanController::class, 'index']);
