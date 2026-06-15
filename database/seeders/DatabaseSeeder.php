@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
 
         // User biasa
         User::updateOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'user@gmail.com'],
             [
                 'nama' => 'Test User',
                 'username' => 'testuser',
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
 
         // Admin
         User::updateOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'admin@gmail.com'],
             [
                 'nama' => 'Admin',
                 'username' => 'admin',
